@@ -33,7 +33,10 @@ def parse_arguments():
     args = parser.parse_args()
     setup_logger(args.log)
     logging.info("Start testing")
-    logging.debug("test args are: {args}".format(args=args))
+    logging.debug("test running on device {device} reulting in function {function} with arguments {args}".format(
+        device=args.device,
+        function=test_func[args.device],
+        args=args.args))
     test_func[args.device](args.args)
 
 
