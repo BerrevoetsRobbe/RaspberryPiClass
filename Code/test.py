@@ -15,13 +15,13 @@ from TestFiles.ReedSensor import test_reed_sensor
 
 test_func = dict(
     LED=test_led,
-    buzzer=test_buzzer,
-    camera=test_camera,
+    BUZZER=test_buzzer,
+    CAMERA=test_camera,
     # light_sensor=test_light_sensor,
-    multiple_led=test_multiple_led,
-    num_pad=test_num_pad,
-    pin_pad=test_pin_pad,
-    reed_sensor=test_reed_sensor
+    MULTIPLE_LED=test_multiple_led,
+    NUM_PAD=test_num_pad,
+    PIN_PAD=test_pin_pad,
+    REED_SENSOR=test_reed_sensor
 )
 
 
@@ -30,22 +30,29 @@ def parse_arguments():
     parser.add_argument('device', metavar='device', type=str)
     parser.add_argument('args', metavar='args', nargs='*')
     parser.add_argument('-l', '--log', help='indicates the level of logging (INFO, DEBUG)')
+    parser.add_argument('-f', '--file', help='write to logs to this file')
     args = parser.parse_args()
-    setup_logger(args.log)
+    setup_logger(args.log, args.file)
     logging.info("Start testing")
-    logging.debug("test args are: {args}".format(args=args))
-    test_func[args.device](args.args)
+    logging.debug("Arguments supplied to testing are: {args}".format(args=args))
+    test_func[args.device.upper()](args.args)
 
 
-def setup_logger(log_level=None):
+def setup_logger(log_level=None, filename=None):
     log_level = log_level or 'WARNING'
     numeric_level = getattr(logging, log_level.upper(), None)
 
     if not isinstance(numeric_level, int):
         raise ValueError('Invalid log level: %s' % log_level)
-    logging.basicConfig(level=numeric_level,
-                        format='%(asctime)s :: [%(levelname)s] :: %(filename)s :: %(message)s',
-                        datefmt='%d/%m/%Y %H:%M:%S')
+    if filename:
+        logging.basicConfig(filename=filename,
+                            level=numeric_level,
+                            format='%(asctime)s :: [%(levelname)s] :: %(filename)s :: %(message)s',
+                            datefmt='%d/%m/%Y %H:%M:%S')
+    else:
+        logging.basicConfig(level=numeric_level,
+                            format='%(asctime)s :: [%(levelname)s] :: %(filename)s :: %(message)s',
+                            datefmt='%d/%m/%Y %H:%M:%S')
 
     logging.info("logger configured")
 

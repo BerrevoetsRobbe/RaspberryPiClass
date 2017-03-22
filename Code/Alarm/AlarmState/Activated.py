@@ -3,8 +3,13 @@ from AlarmState import AlarmState
 
 class Activated(AlarmState):
 
+    def perform_action(self):
+        pass
+
     def __init__(self, alarm, actuators, door_state):
         super(Activated, self).__init__(alarm, actuators, door_state)
+        for actuator in self.__actuators:
+            actuator.perform_action_activated()
 
     def door_opened(self):
         super(Activated, self).door_opened()
@@ -13,10 +18,6 @@ class Activated(AlarmState):
 
     def door_closed(self):
         super(Activated, self).door_closed()
-
-    def perform_action(self):
-        for actuator in self.__actuators:
-            actuator.perform_action_activated()
 
     def alarm_deactivated(self):
         from Idle import Idle

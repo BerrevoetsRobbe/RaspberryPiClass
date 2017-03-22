@@ -13,21 +13,14 @@ TRIGGERED_TIME = 20
 
 
 def test_general(_led):
-    start_time = time()
-    while start_time + IDLE_TIME > time():
-        _led.perform_action_idle()
-    start_time = time()
-    while start_time + ACTIVATION_TIME > time():
-        _led.perform_action_activated()
-    start_time = time()
-    while start_time + TRIGGERED_TIME > time():
-        _led.perform_action_triggered()
+    # unable to use time() to often
+    _led.perform_action_idle(duration=IDLE_TIME)
+    _led.perform_action_activated(duration=ACTIVATION_TIME)
+    _led.perform_action_triggered(duration=TRIGGERED_TIME)
 
 
 def test_triggered(_led):
-    start_time = time()
-    while start_time + TRIGGERED_TIME > time():
-        _led.perform_action_triggered()
+    _led.perform_action_triggered(duration=TRIGGERED_TIME)
 
 
 def test_led(args):
@@ -35,9 +28,14 @@ def test_led(args):
         print("You must give r and g pin as arguments")
         sys.exit(1)
     led = LED(int(args[0]), int(args[1]))
+    led.start()
     try:
+        led.perform_action_idle()
         test_triggered(led)
+        while True:
+            pass
     finally:
+        led.join(2)
         logging.info("Cleanup LED")
         led.destroy()
         GPIO.cleanup()
