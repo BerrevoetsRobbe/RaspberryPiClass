@@ -27,6 +27,7 @@ class NumPad(BaseSensor):
         self.setup()
 
     def setup(self):
+        # TODO: setup can accept a list
         for pin in self.__input_column_pins:
             GPIO.setup(pin, GPIO.OUT)
             GPIO.output(pin, GPIO.LOW)

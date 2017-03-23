@@ -5,6 +5,8 @@ class Idle(AlarmState):
 
     def __init__(self, alarm, actuators, door_state):
         super(Idle, self).__init__(alarm, actuators, door_state)
+        for actuator in self.get_actuators():
+            actuator.perform_action_idle()
 
     def door_opened(self):
         super(Idle, self).door_opened()
@@ -13,8 +15,7 @@ class Idle(AlarmState):
         super(Idle, self).door_closed()
 
     def perform_action(self):
-        for actuator in self.get_actuators():
-            actuator.perform_action_idle()
+        pass
 
     def alarm_deactivated(self):
         pass
