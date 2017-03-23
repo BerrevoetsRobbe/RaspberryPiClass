@@ -17,3 +17,6 @@ class DoorSensor(CustomSensor):
 
     def is_deactivated(self):
         return self.__sensor.get_value() == self.__closed_value
+
+    def destroy(self):
+        pass

@@ -16,3 +16,6 @@ class LightSensor(BaseSensor):
 
     def get_value(self):
         return ADC.read(0)
+
+    def destroy(self):
+        pass

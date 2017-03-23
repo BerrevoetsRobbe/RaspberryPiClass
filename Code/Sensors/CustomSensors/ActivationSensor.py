@@ -17,3 +17,6 @@ class ActivationSensor(CustomSensor):
 
     def is_deactivated(self):
         return self.__sensor.get_value() == self.__deactive_value
+
+    def destroy(self):
+        pass

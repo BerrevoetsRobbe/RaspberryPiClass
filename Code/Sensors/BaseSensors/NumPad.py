@@ -1,4 +1,5 @@
 from BaseSensor import BaseSensor
+from Actuators.BaseActuators.BuzzerStates.SingleBeep import SingleBeep
 import RPi.GPIO as GPIO
 import logging
 import time
@@ -12,8 +13,10 @@ class NumPad(BaseSensor):
     COLUMN_DIMENSION = 3
     BOUNCE_TIME = 500
     STROKE_INTERVAL = 0.3
+    BEEP_DURATION = 0.15
 
-    def __init__(self, input_row_pins, input_column_pins, keys, callback_function=None):
+    def __init__(self, input_row_pins, input_column_pins, keys, buzzer, callback_function=None):
+        self.__buzzer = buzzer
         self.__keys = keys
         self.__callback_function = callback_function or self.detect
         self.__input_row_pins = input_row_pins
@@ -24,12 +27,16 @@ class NumPad(BaseSensor):
                                                 col_pins=self.__input_column_pins,
                                                 callback=self.__callback_function,
                                                 keys=self.__keys))
-        self.setup()
+        GPIO.setup(self.__input_column_pins, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.setup(self.__input_row_pins, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        for pin in self.__input_row_pins:
+            GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.__callback_function, bouncetime=self.BOUNCE_TIME)
+            # self.setup()
 
     def setup(self):
         # TODO: setup can accept a list
         for pin in self.__input_column_pins:
-            GPIO.setup(pin, GPIO.OUT)
+            GPIO.setup(self.__input_column_pins, GPIO.OUT, initial=GPIO.LOW)
             GPIO.output(pin, GPIO.LOW)
         for pin in self.__input_row_pins:
             GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -67,6 +74,7 @@ class NumPad(BaseSensor):
             logger.info("key {key} pressed with value {value}".format(key=self.__keys[row_val*3 + col_val],
                                                                       value=self.__keys[row_val*3 + col_val].get_value()))
             self.__last_stroke = time.time()
+            self.__buzzer.set_state(SingleBeep(self.__buzzer, duration=self.BEEP_DURATION, returning_state=self.__buzzer.state))
             return self.__keys[row_val*3 + col_val]
 
     def set_column_pins_to_input(self):
@@ -74,9 +82,7 @@ class NumPad(BaseSensor):
             GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
     def set_column_pins_to_output(self):
-        for pin in self.__input_column_pins:
-            GPIO.setup(pin, GPIO.OUT)
-            GPIO.output(pin, GPIO.LOW)
+        GPIO.setup(self.__input_column_pins, GPIO.OUT, initial=GPIO.LOW)
 
     def set_row_pin_to_input(self, pin_number):
         GPIO.setup(pin_number, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -118,3 +124,6 @@ class NumPad(BaseSensor):
             logger.info("key {key} pressed with value {value}".format(key=self.__keys[row_number*3 + col_number],
                                                                       value=self.__keys[row_number*3 + col_number].get_value()))
             return self.__keys[row_number*3 + col_number]
+
+    def destroy(self):
+        self.__buzzer.stop()

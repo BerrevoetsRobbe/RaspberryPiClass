@@ -9,9 +9,3 @@ class NumKey(Key):
 
     def get_value(self):
         return self.__number
-
-    def __str__(self):
-        return "Key with value: {value}".format(value=self.__number)
-
-    def __repr__(self):
-        return self.__str__()

@@ -10,3 +10,6 @@ class ReedSensor(BaseSensor):
 
     def get_value(self):
         return GPIO.input(self.__input_pin)
+
+    def destroy(self):
+        pass
