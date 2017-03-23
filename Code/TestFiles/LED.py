@@ -36,7 +36,6 @@ def test_led(args):
             # yield processor
             sleep(0.000001)
     finally:
-        logging.info("Cleanup LED")
         led.stop()
         led.join(2)
         GPIO.cleanup()

@@ -47,7 +47,6 @@ def test_multiple_led(args):
             # yield processor
             sleep(0.00001)
     finally:
-        logging.debug("Cleanup MultipleLED")
         multiple_led.stop()
         multiple_led.join(2)
         sleep(4)

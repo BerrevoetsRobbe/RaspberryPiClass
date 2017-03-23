@@ -12,22 +12,15 @@ TRIGGERED_TIME = 5
 
 
 def test_idle(buzzer):
-    start_time = time()
-    while start_time + IDLE_TIME > time():
-        buzzer.perform_action_idle()
+    pass
 
 
 def test_activated(buzzer):
-    start_time = time()
-    while start_time + ACTIVATION_TIME > time():
-        buzzer.perform_action_activated()
+    pass
 
 
 def test_triggered(buzzer):
-    start_time = time()
-    while start_time + TRIGGERED_TIME > time():
-        buzzer.perform_action_triggered()
-
+    pass
 
 def test_general(buzzer):
     test_idle(buzzer)
@@ -53,7 +46,6 @@ def test_buzzer(args):
             # yield processor
             sleep(0.000001)
     finally:
-        logging.info("Cleanup Buzzer")
         buzzer.stop()
         buzzer.join(2)
         GPIO.cleanup()
