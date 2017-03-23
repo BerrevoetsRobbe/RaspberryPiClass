@@ -5,7 +5,7 @@ import RPi.GPIO as GPIO
 import logging
 
 from Actuators.BaseActuators.LED import LED
-from time import time
+from time import sleep
 
 IDLE_TIME = 10
 ACTIVATION_TIME = 10
@@ -33,7 +33,8 @@ def test_led(args):
         led.perform_action_idle()
         test_triggered(led)
         while True:
-            pass
+            # yield processor
+            sleep(0.000001)
     finally:
         led.join(2)
         logging.info("Cleanup LED")

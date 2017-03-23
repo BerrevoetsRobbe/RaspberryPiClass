@@ -1,7 +1,7 @@
 import logging
 
 from abc import ABCMeta, abstractmethod
-from time import time
+from time import time, sleep
 
 
 class LEDState(object):
@@ -18,7 +18,10 @@ class LEDState(object):
         self.start_time = time()
 
     def perform_action(self):
-        if self.duration != -1 and self.start_time + self.duration < time() and self.returning_state:
+        if not(self.duration != -1 and self.start_time + self.duration < time() and self.returning_state):
+            # yield processor
+            sleep(0.000001)
+        else:
             logging.debug("Return to previous state {state}".format(state=self.returning_state))
             self.led.set_state(self.returning_state)
             self.returning_state.return_to()
