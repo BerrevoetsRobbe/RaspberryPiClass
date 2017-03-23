@@ -9,7 +9,7 @@ from time import sleep
 
 IDLE_TIME = 10
 ACTIVATION_TIME = 10
-TRIGGERED_TIME = 20
+TRIGGERED_TIME = 10
 
 
 def test_general(_led):
@@ -31,12 +31,12 @@ def test_led(args):
     led.start()
     try:
         led.perform_action_idle()
-        test_triggered(led)
+        led.perform_action_triggered(duration=TRIGGERED_TIME)
         while True:
             # yield processor
             sleep(0.000001)
     finally:
-        led.join(2)
         logging.info("Cleanup LED")
-        led.destroy()
+        led.stop()
+        led.join(2)
         GPIO.cleanup()

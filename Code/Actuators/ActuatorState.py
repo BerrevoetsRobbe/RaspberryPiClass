@@ -8,10 +8,11 @@ class ActuatorState(object):
     __metaclass__ = ABCMeta
 
     def __init__(self, actuator, duration=-1, returning_state=None):
-        logging.debug("initialising actuator state with device {actuator}, duration {duration}s"
-                      " and returning state: {state}".format(actuator=actuator,
-                                                             duration=duration,
-                                                             state=returning_state))
+        logging.debug("initialising actuator state {state} for device {actuator} with duration {duration}s"
+                      " and returning state: {returning_state}".format(state=self,
+                                                                       actuator=actuator,
+                                                                       duration=duration,
+                                                                       returning_state=returning_state))
         self.actuator = actuator
         self.duration = duration
         self.returning_state = returning_state

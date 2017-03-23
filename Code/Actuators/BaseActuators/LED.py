@@ -20,7 +20,6 @@ class LED(BaseActuator):
 
     def __init__(self, r_pin, g_pin):
         super(LED, self).__init__(None)
-        self.__exit_flag = False
         self.__r_pin = r_pin
         self.__g_pin = g_pin
         GPIO.setup([self.__r_pin, self.__g_pin], GPIO.OUT)  # Set pins' mode is output
@@ -33,15 +32,15 @@ class LED(BaseActuator):
 
     def perform_action_idle(self, duration=-1):
         logger.debug("LED performing idle action")
-        self.state = Green(self, duration=duration, returning_state=self.state)
+        self.set_state(Green(self, duration=duration, returning_state=self.state))
 
     def perform_action_activated(self, duration=-1):
         logger.debug("LED performing activated action")
-        self.state = Red(self, duration=duration, returning_state=self.state)
+        self.set_state(Red(self, duration=duration, returning_state=self.state))
 
     def perform_action_triggered(self, duration=-1):
         logger.debug("LED performing triggered action")
-        self.state = FlashRed(self, self.TRIGGER_PERIOD, duration=duration, returning_state=self.state)
+        self.set_state(FlashRed(self, self.TRIGGER_PERIOD, duration=duration, returning_state=self.state))
 
     def __map(self, x):
         return (x - self.COLOR_MIN_VALUE) / (self.COLOR_MAX_VALUE - self.COLOR_MIN_VALUE) \
@@ -75,13 +74,5 @@ class LED(BaseActuator):
 
     def destroy(self):
         logger.debug("LED cleanup")
-        self.__exit_flag = True
         self.__turn_off()
         GPIO.output([self.__r_pin, self.__g_pin], GPIO.LOW)
-
-    def set_state(self, state):
-        self.state = state
-
-    def run(self):
-        while not self.__exit_flag:
-            self.state.perform_action()
