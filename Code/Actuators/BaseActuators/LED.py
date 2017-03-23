@@ -19,7 +19,7 @@ class LED(BaseActuator):
     TRIGGER_PERIOD = .5
 
     def __init__(self, r_pin, g_pin):
-        super(LED, self).__init__()
+        super(LED, self).__init__(None)
         self.__exit_flag = False
         self.__r_pin = r_pin
         self.__g_pin = g_pin
@@ -29,7 +29,7 @@ class LED(BaseActuator):
         self.__g_pulse = GPIO.PWM(self.__g_pin, 2000)
         self.__r_pulse.start(self.PWM_MIN_VALUE)  # Initial duty Cycle = 0(leds off)
         self.__g_pulse.start(self.PWM_MIN_VALUE)
-        self.state = Blank(self)
+        self.set_state(Blank(self))
 
     def perform_action_idle(self, duration=-1):
         logger.debug("LED performing idle action")

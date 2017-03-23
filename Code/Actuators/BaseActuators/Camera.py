@@ -8,17 +8,17 @@ logger = logging.getLogger(__name__)
 class Camera(BaseActuator):
 
     def __init__(self):
-        super(Camera, self).__init__()
+        super(Camera, self).__init__(None)
         self.__camera = PiCamera()
         self.__counter = 0
 
-    def perform_action_idle(self):
+    def perform_action_idle(self, duration=-1):
         logger.debug("Camera performing idle action")
 
-    def perform_action_activated(self):
+    def perform_action_activated(self, duration=-1):
         logger.debug("Camera performing activated action")
 
-    def perform_action_triggered(self):
+    def perform_action_triggered(self, duration=-1):
         logger.debug("Camera performing triggered action")
         self.__take_picture()
 

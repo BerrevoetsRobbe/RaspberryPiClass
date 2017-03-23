@@ -12,19 +12,19 @@ class Buzzer(BaseActuator):
     BUZZER_MUTE_OUTPUT = GPIO.HIGH
 
     def __init__(self, buzzer_pin):
-        super(Buzzer, self).__init__()
+        super(Buzzer, self).__init__(None)
         self.__buzzer_pin = buzzer_pin
         self.__mute_buzzer()
 
-    def perform_action_idle(self):
+    def perform_action_idle(self, duration=-1):
         logger.debug("Buzzer performing idle action")
         self.__mute_buzzer()
 
-    def perform_action_activated(self):
+    def perform_action_activated(self, duration=-1):
         logger.debug("Buzzer performing activated action")
         self.__mute_buzzer()
 
-    def perform_action_triggered(self):
+    def perform_action_triggered(self, duration=-1):
         logger.debug("Buzzer performing triggered action")
         if time() % 2 >= 1:
             self.__sound_buzzer()

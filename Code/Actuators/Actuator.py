@@ -5,8 +5,9 @@ from threading import Thread
 class Actuator(Thread):
     __metaclass__ = ABCMeta
 
-    def __init__(self):
+    def __init__(self, state):
         super(Actuator, self).__init__()
+        self.state = state
 
     @abstractmethod
     def perform_action_idle(self, duration=-1):
@@ -23,3 +24,6 @@ class Actuator(Thread):
     @abstractmethod
     def destroy(self):
         raise NotImplementedError()
+
+    def set_state(self, state):
+        self.state = state
