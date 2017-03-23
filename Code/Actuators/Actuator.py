@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from threading import Thread
-
+import logging
 
 class Actuator(Thread):
     __metaclass__ = ABCMeta
@@ -27,6 +27,8 @@ class Actuator(Thread):
         raise NotImplementedError()
 
     def set_state(self, state):
+        logging.debug("setting state of device {device} to {state}".format(device=self,
+                                                                           state=state))
         self.state = state
 
     def stop(self):
