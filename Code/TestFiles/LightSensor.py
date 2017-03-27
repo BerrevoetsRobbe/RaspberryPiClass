@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # arg1 = light_pin, arg2 = r_pin, arg3 = g_pin
 import logging
+
 import RPi.GPIO as GPIO
 
 from Actuators.BaseActuators.LED import LED
-from Sensors.BaseSensors.LightSensor import LightSensor
-
+from Sensors.BaseSensors.PollingSensors.LightSensor import LightSensor
 
 IDLE_TIME = 10
 ACTIVATION_TIME = 10

@@ -1,4 +1,4 @@
-from BaseSensor import BaseSensor
+from Sensors.BaseSensors.BaseSensor import BaseSensor
 import RPi.GPIO as GPIO
 
 

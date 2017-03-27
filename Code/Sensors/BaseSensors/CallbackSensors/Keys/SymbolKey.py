@@ -1,4 +1,4 @@
-from Key import Key
+from Sensors.BaseSensors.CallbackSensors.Keys.Key import Key
 
 
 class SymbolKey(Key):

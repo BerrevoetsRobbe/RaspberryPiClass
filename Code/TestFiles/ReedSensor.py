@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # arg1 = reed_pin, arg2 = r_pin, arg3 = g_pin
 import logging
+
 import RPi.GPIO as GPIO
 
 from Actuators.BaseActuators.LED import LED
-from Sensors.BaseSensors.ReedSensor import ReedSensor
+from Sensors.BaseSensors.PollingSensors.ReedSensor import ReedSensor
 
 
 def test_reed_sensor(args):

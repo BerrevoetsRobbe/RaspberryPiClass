@@ -1,16 +1,19 @@
-from BaseSensor import BaseSensor
-from NumPad import NumPad
 import logging
+
+from Sensors.BaseSensors.CallbackSensors.NumPad import NumPad
+from Sensors.CustomSensors.CallbackSensors.CallbackSensor import CallbackSensor
 
 logger = logging.getLogger(__name__)
 
 
-class PinPad(BaseSensor):
+class PinPad(CallbackSensor):
 
-    def __init__(self, input_row_pins, input_column_pins, keys, pin, escape_key, buzzer):
+    def __init__(self, input_row_pins, input_column_pins, keys, pin, escape_key, buzzer, callback_function=None):
+        super(PinPad, self).__init__(callback_function)
         logging.debug("PinPad created with pin {pin} and escape_key {escape_key}".format(pin=pin,
                                                                                          escape_key=escape_key))
         self.__numpad = NumPad(input_row_pins, input_column_pins, keys, buzzer, self.register_key)
+        self.__numpad.start()
         self.__pin = [int(i) for i in str(pin)]
         self.__escape_key = escape_key
         self.__key_history = []
@@ -19,10 +22,7 @@ class PinPad(BaseSensor):
     def get_value(self):
         return self.__activated
 
-    def register_key(self, channel):
-        key = self.__numpad.detect(channel)
-        if key is None:
-            return
+    def register_key(self, key):
         if key.get_value() == self.__escape_key:
             logger.debug("escape key entered")
             self.__key_history = []
@@ -41,7 +41,8 @@ class PinPad(BaseSensor):
 
     def __pin_entered(self):
         self.__activated *= -1
-        logger.info("pin entered: system is {active}active".format(active="not " if self.__activated==-1 else ""))
+        logger.info("pin entered: system is now {active}active".format(active="not " if self.__activated == -1 else ""))
+        self.callback_function(self.__activated)
 
     def destroy(self):
-        self.__numpad.destroy()
+        self.__numpad.stop()

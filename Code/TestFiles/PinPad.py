@@ -1,12 +1,14 @@
 # arg1 = reed_pin, arg2 = r_pin, arg3 = g_pin
 import logging
+from time import sleep
+
 import RPi.GPIO as GPIO
+from Sensors.BaseSensors.NumKey import NumKey
+from Sensors.BaseSensors.SymbolKey import SymbolKey
 
 from Actuators.BaseActuators.Buzzer import Buzzer
-from Sensors.BaseSensors.NumKey import NumKey
-from Sensors.BaseSensors.PinPad import PinPad
-from Sensors.BaseSensors.SymbolKey import SymbolKey
-from time import sleep
+from Sensors.CustomSensors.CallbackSensors.PinPad import PinPad
+
 
 def create_key_list():
     logging.debug("start key creation")

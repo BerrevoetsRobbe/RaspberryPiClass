@@ -2,6 +2,7 @@ from abc import ABCMeta, abstractmethod
 from threading import Thread
 import logging
 
+
 class Actuator(Thread):
     __metaclass__ = ABCMeta
 

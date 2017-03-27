@@ -1,12 +1,14 @@
 # arg1 = reed_pin, arg2 = r_pin, arg3 = g_pin
 import logging
-import RPi.GPIO as GPIO
+from time import sleep
 
-from Actuators.BaseActuators.Buzzer import Buzzer
-from Sensors.BaseSensors.NumPad import NumPad
+import RPi.GPIO as GPIO
 from Sensors.BaseSensors.NumKey import NumKey
 from Sensors.BaseSensors.SymbolKey import SymbolKey
-from time import sleep
+
+from Actuators.BaseActuators.Buzzer import Buzzer
+from Sensors.BaseSensors.CallbackSensors.NumPad import NumPad
+
 
 def create_key_list():
     logging.debug("start key creation")
@@ -25,14 +27,15 @@ def test_num_pad(args):
     buzzer = Buzzer(buzzer_pin)
     buzzer.start()
     keys = create_key_list()
-    num_pad = NumPad(row_pins, col_pins, keys, buzzer)
-    logging.info("created numpad: {numpad}".format(numpad=num_pad))
+    numpad = NumPad(row_pins, col_pins, keys, buzzer)
+    numpad.start()
+    logging.info("created numpad: {numpad}".format(numpad=numpad))
     try:
         while True:
             # yield processor
             sleep(0.000001)
     finally:
         logging.info('Cleanup numpad')
-        num_pad.destroy()
+        numpad.stop()
         sleep(2)
         GPIO.cleanup()
