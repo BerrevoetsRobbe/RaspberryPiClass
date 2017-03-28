@@ -1,8 +1,8 @@
 from BaseActuator import BaseActuator
-from LEDState.Blank import Blank
-from LEDState.Green import Green
-from LEDState.Red import Red
-from LEDState.FlashRed import FlashRed
+from LEDStates.Blank import Blank
+from LEDStates.Green import Green
+from LEDStates.Red import Red
+from LEDStates.FlashRed import FlashRed
 
 import RPi.GPIO as GPIO
 import logging

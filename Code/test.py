@@ -5,7 +5,7 @@ import RPi.GPIO as GPIO
 from TestFiles.LED import test_led
 from TestFiles.Buzzer import test_buzzer
 from TestFiles.Camera import test_camera
-# from TestFiles.LightSensor import test_light_sensor
+from TestFiles.LightSensor import test_light_sensor
 from TestFiles.MultipleLED import test_multiple_led
 from TestFiles.NumPad import test_num_pad
 from TestFiles.PinPad import test_pin_pad
@@ -17,7 +17,7 @@ test_func = dict(
     LED=test_led,
     BUZZER=test_buzzer,
     CAMERA=test_camera,
-    # light_sensor=test_light_sensor,
+    LIGHT_SENSOR=test_light_sensor,
     MULTIPLE_LED=test_multiple_led,
     NUM_PAD=test_num_pad,
     PIN_PAD=test_pin_pad,

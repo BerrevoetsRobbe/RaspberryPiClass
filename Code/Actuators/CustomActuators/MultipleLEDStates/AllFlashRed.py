@@ -1,4 +1,4 @@
-from Actuators.BaseActuators.LEDState.FlashRed import FlashRed
+from Actuators.BaseActuators.LEDStates.FlashRed import FlashRed
 from Actuators.CustomActuators.MultipleLEDStates.MultipleLEDState import MultipleLEDState
 
 

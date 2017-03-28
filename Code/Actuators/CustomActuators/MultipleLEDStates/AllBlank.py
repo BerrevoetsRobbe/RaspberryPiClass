@@ -1,4 +1,4 @@
-from Actuators.BaseActuators.LEDState.Blank import Blank
+from Actuators.BaseActuators.LEDStates.Blank import Blank
 from Actuators.CustomActuators.MultipleLEDStates.MultipleLEDState import MultipleLEDState
 
 
