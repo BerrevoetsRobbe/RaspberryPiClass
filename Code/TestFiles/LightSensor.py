@@ -1,15 +1,9 @@
-#!/usr/bin/env python
-# arg1 = light_pin, arg2 = r_pin, arg3 = g_pin
 import logging
-
 import RPi.GPIO as GPIO
 
+from time import sleep
 from Actuators.BaseActuators.LED import LED
 from Sensors.BaseSensors.PollingSensors.LightSensor import LightSensor
-
-IDLE_TIME = 10
-ACTIVATION_TIME = 10
-TRIGGERED_TIME = 10
 
 
 def test_general(light_sensor, led):
@@ -17,8 +11,10 @@ def test_general(light_sensor, led):
         logging.info("light sensor value: {value}".format(value=light_sensor.get_value()))
         if light_sensor.get_value() == 0:
             led.perform_action_idle()
+            sleep(0.000001)
         if light_sensor.get_value() == 1:
             led.perform_action_activated()
+            sleep(0.000001)
 
 
 def test_light_sensor(args):
@@ -28,6 +24,7 @@ def test_light_sensor(args):
     try:
         test_general(light_sensor, led)
     finally:
-        logging.info("Cleanup LED and lightsensor")
+        light_sensor.destroy()
         led.destroy()
+        sleep(1)
         GPIO.cleanup()

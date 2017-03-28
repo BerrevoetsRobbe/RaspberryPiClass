@@ -12,10 +12,10 @@ class LightSensor(BaseSensor):
         self.__input_pin = input_pin
         ADC.setup(0x48)
         GPIO.setup(self.__input_pin, GPIO.IN)
-        logger.info("LightSensor {light_sensor} initialized: ".format(light_sensor=self))
 
     def get_value(self):
         return ADC.read(0)
 
     def destroy(self):
+        logging.debug("Cleanup LightSensor")
         pass
