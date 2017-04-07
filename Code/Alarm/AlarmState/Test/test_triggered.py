@@ -11,8 +11,8 @@ from Alarm.AlarmState.Idle import Idle
 class TestTriggered(TestCase):
 
     def setUp(self):
-        self.alarm = Alarm([], None, None)
-        self.triggered = Triggered(self.alarm, [], AlarmState.DOOR_OPEN)
+        self.alarm = Alarm()
+        self.triggered = Triggered(self.alarm, AlarmState.DOOR_OPEN)
         self.alarm.set_alarm_state(self.triggered)
 
     def test_door_opened(self):
@@ -55,28 +55,26 @@ class TestTriggered(TestCase):
     @mock.patch('time.time')
     def test_perform_action_time_not_exceeded(self, mock_time):
         mock_time.return_value = 0
-        alarm = Alarm([], None, None)
+        alarm = Alarm()
         triggered = Triggered(alarm, [], AlarmState.DOOR_OPEN)
         alarm.set_alarm_state(triggered)
 
         mock_time.return_value = 20
-        triggered.perform_action()
 
         self.assertIsInstance(alarm.get_alarm_state(), Triggered)
 
     @mock.patch('time.time')
     def test_perform_action_time_exceeded(self, mock_time):
         mock_time.return_value = 0
-        alarm = Alarm([], None, None)
+        alarm = Alarm()
         triggered = Triggered(alarm, [], AlarmState.DOOR_OPEN)
         alarm.set_alarm_state(triggered)
 
-        self.assertEqual(triggered.get_trigger_time(), 0)
+        self.assertEqual(triggered.start_time, 0)
 
         mock_time.return_value = 40
 
         self.assertEqual(time.time(), 40)
-        triggered.perform_action()
 
         self.assertIsInstance(alarm.get_alarm_state(), Idle)
         self.assertTrue(alarm.get_alarm_state().is_door_open())

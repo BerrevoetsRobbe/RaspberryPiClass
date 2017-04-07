@@ -43,6 +43,6 @@ class Buzzer(BaseActuator):
         GPIO.setup(self.__buzzer_pin, GPIO.IN)
 
     def destroy(self):
-        logger.debug("Buzzer cleanup")
+        logger.info("Buzzer cleanup")
         GPIO.setup(self.__buzzer_pin, GPIO.OUT)
         GPIO.output(self.__buzzer_pin, self.BUZZER_MUTE_OUTPUT)

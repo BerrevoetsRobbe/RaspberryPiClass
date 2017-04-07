@@ -2,6 +2,8 @@ from threading import Thread
 
 from abc import ABCMeta, abstractmethod
 
+import logging
+
 from Sensors.CustomSensors.CustomSensor import CustomSensor
 
 
@@ -19,6 +21,7 @@ class CallbackSensor(CustomSensor, Thread):
         raise NotImplementedError()
 
     def stop(self):
+        logging.info("Stopping {object}".format(object=self))
         self.exit_flag = True
 
     def default_action(self, value):

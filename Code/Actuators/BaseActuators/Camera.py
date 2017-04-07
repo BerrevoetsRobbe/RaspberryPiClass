@@ -34,5 +34,5 @@ class Camera(BaseActuator):
         self.__counter += 1
 
     def destroy(self):
-        logger.debug("Camera cleanup")
+        logger.info("Camera cleanup")
         self.__camera.close()

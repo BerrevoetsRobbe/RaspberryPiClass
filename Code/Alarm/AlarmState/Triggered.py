@@ -1,15 +1,16 @@
 import time
 
+import logging
+
 from AlarmState import AlarmState
 
 
 class Triggered(AlarmState):
 
-    TRIGGER_DURATION = 30
+    TRIGGER_DURATION = 5
 
-    def __init__(self, alarm, actuators, door_state):
-        super(Triggered, self).__init__(alarm, actuators, door_state)
-        self.__trigger_time = time.time()
+    def __init__(self, alarm, door_state, duration=-1, return_state=None):
+        super(Triggered, self).__init__(alarm, door_state, duration, return_state)
         for actuator in self.get_actuators():
             actuator.perform_action_triggered()
 
@@ -19,15 +20,13 @@ class Triggered(AlarmState):
     def door_closed(self):
         super(Triggered, self).door_closed()
 
-    def perform_action(self):
-        pass
-
     def alarm_deactivated(self):
         from Idle import Idle
-        self.set_alarm_state(Idle(self.get_alarm(), self.get_actuators(), self.get_door_state()))
+        self.set_alarm_state(Idle(self.get_alarm(), self.get_door_state()))
 
     def alarm_activated(self):
         pass
 
-    def get_trigger_time(self):
-        return self.__trigger_time
+    def refresh(self):
+        for actuator in self.get_actuators():
+            actuator.perform_action_triggered()

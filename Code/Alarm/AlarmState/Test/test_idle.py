@@ -8,7 +8,7 @@ from Alarm.AlarmState.Triggered import Triggered
 class TestIdle(TestCase):
 
     def setUp(self):
-        self.alarm = Alarm([], None, None)
+        self.alarm = Alarm()
         self.idle = self.alarm.get_alarm_state()
 
     def test_door_state(self):

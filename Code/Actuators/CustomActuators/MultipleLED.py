@@ -30,7 +30,7 @@ class MultipleLED(CustomActuator):
         self.set_state(AllFlashRed(self, self.TRIGGER_PERIOD, duration=duration, returning_state=self.state))
 
     def destroy(self):
-        logger.debug("MultipleLED cleanup")
+        logger.info("MultipleLED cleanup")
         for led in self.__leds:
             led.stop()
 

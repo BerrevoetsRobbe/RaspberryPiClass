@@ -19,7 +19,7 @@ def test_reed_sensor(args):
                 sleep(0.000001)
 
     finally:
-        led.destroy()
+        led.stop()
         reed_sensor.destroy()
         sleep(0.5)
         GPIO.cleanup()

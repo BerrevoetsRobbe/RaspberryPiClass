@@ -9,8 +9,8 @@ from Alarm.AlarmState.Idle import Idle
 class TestActivated(TestCase):
 
     def setUp(self):
-        self.alarm = Alarm([], None, None)
-        self.activated = Activated(self.alarm, [], AlarmState.DOOR_CLOSED)
+        self.alarm = Alarm()
+        self.activated = Activated(self.alarm, AlarmState.DOOR_CLOSED)
         self.alarm.set_alarm_state(self.activated)
 
     def test_door_opened(self):

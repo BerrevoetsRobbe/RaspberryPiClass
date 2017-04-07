@@ -57,9 +57,12 @@ class NumPad(CallbackSensor):
             self.callback_function(self.__keys[row*3 + col])
 
     def destroy(self):
+        logging.info("Numpad cleanup")
         self.__buzzer.stop()
 
     def run(self):
         while not self.exit_flag:
             self.detect()
+
+        logging.info("Numpad cleanup")
         self.destroy()

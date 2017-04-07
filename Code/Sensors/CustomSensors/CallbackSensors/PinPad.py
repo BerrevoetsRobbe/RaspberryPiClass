@@ -1,4 +1,5 @@
 import logging
+from time import sleep
 
 from Sensors.BaseSensors.CallbackSensors.NumPad import NumPad
 from Sensors.CustomSensors.CallbackSensors.CallbackSensor import CallbackSensor
@@ -8,7 +9,8 @@ logger = logging.getLogger(__name__)
 
 class PinPad(CallbackSensor):
 
-    def __init__(self, input_row_pins, input_column_pins, keys, pin, escape_key, buzzer, callback_function=None):
+    def __init__(self, input_row_pins, input_column_pins, keys, pin, escape_key, buzzer, callback_function=None,
+                 activated=False):
         super(PinPad, self).__init__(callback_function)
         logging.debug("PinPad created with pin {pin} and escape_key {escape_key}".format(pin=pin,
                                                                                          escape_key=escape_key))
@@ -17,7 +19,7 @@ class PinPad(CallbackSensor):
         self.__pin = [int(i) for i in str(pin)]
         self.__escape_key = escape_key
         self.__key_history = []
-        self.__activated = -1
+        self.__activated = activated
 
     def get_value(self):
         return self.__activated
@@ -40,9 +42,18 @@ class PinPad(CallbackSensor):
             self.__key_history = []
 
     def __pin_entered(self):
-        self.__activated *= -1
-        logger.info("pin entered: system is now {active}active".format(active="not " if self.__activated == -1 else ""))
+        self.__activated = not self.__activated
+        logger.info("pin entered: system is now {active}active".format(active="not " if not self.__activated else ""))
         self.callback_function(self.__activated)
 
     def destroy(self):
+        logging.info("PinPad cleanup")
         self.__numpad.stop()
+
+    def run(self):
+        while not self.exit_flag:
+            sleep(0.000001)
+        self.destroy()
+
+    def set_pin(self, pin):
+        self.__pin = [int(i) for i in str(pin)]

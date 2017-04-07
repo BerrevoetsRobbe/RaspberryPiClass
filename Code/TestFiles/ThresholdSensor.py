@@ -4,7 +4,7 @@ from Actuators.BaseActuators.LED import LED
 from Actuators.BaseActuators.LEDStates.Green import Green
 from Actuators.BaseActuators.LEDStates.Red import Red
 from Sensors.BaseSensors.PollingSensors.LightSensor import LightSensor
-from Sensors.CustomSensors.ThresholdSensors.ThresholdSensor import ThresholdSensor
+from Sensors.CustomSensors.PollingSensors.ThresholdSensor import ThresholdSensor
 
 led = None
 THRESHOLD_VALUE = 0.5  # TODO: determine value

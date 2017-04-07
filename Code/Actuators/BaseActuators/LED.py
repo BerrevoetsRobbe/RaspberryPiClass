@@ -73,6 +73,6 @@ class LED(BaseActuator):
         self.__set_r_pulse(self.__map(g_value))
 
     def destroy(self):
-        logger.debug("LED cleanup")
+        logger.info("LED cleanup")
         self.__turn_off()
         GPIO.output([self.__r_pin, self.__g_pin], GPIO.LOW)
