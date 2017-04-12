@@ -25,8 +25,11 @@ def test_triggered(_led):
 
 def test_led(args):
     if len(args) < 2:
-        print("You must give r and g pin as arguments")
+        logging.info("You must give r and g pin as arguments")
+        logging.warning("Je moet minstens 2 pin nummers meegeven, eentje voor de R pin en eentje voor de G pin")
         sys.exit(1)
+
+    logging.warning("Testen van een LED")
     led = LED(int(args[0]), int(args[1]))
     led.start()
     try:

@@ -3,6 +3,7 @@
 # give combination of r_pin g_pin as arg
 #
 import RPi.GPIO as GPIO
+import sys
 
 from Actuators.BaseActuators.LED import LED
 from Actuators.CustomActuators.MultipleLED import MultipleLED
@@ -31,8 +32,10 @@ def test_general(multiple_led):
 
 def test_multiple_led(args):
     if len(args) % 2 == 1:
-        print "there must be an equal amount of red and green pins"
-
+        logging.info("there must be an equal amount of red and green pins")
+        logging.warning("Het aantal pin nummers dat je meegeeft moet even zijn")
+        sys.exit(1)
+    logging.warning("Testen van meerdere LEDs")
     leds = [LED(int(args[i]), int(args[i+1])) for i in range(0, len(args), 2)]
     for led in leds:
         led.start()

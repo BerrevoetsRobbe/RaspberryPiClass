@@ -1,11 +1,19 @@
 import RPi.GPIO as GPIO
 
 from time import sleep
+
+import logging
+
 from Actuators.BaseActuators.LED import LED
 from Sensors.BaseSensors.PollingSensors.ReedSensor import ReedSensor
 
 
 def test_reed_sensor(args):
+    if len(args) < 3:
+        logging.info("You must give the reed sensor pin and the two pins of the LED")
+        logging.warning("Je moet 1 pin nummer van de magneet sensor geven en de 2 pin nummers van de LED sensor")
+        sys.exit(1)
+    logging.warning("Testen van de magneet sensor")
     reed_sensor = ReedSensor(int(args[0]))
     led = LED(int(args[1]), int(args[2]))
 

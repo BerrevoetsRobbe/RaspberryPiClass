@@ -3,6 +3,7 @@ import logging
 from time import sleep
 
 import RPi.GPIO as GPIO
+import sys
 from Sensors.BaseSensors.NumKey import NumKey
 from Sensors.BaseSensors.SymbolKey import SymbolKey
 
@@ -21,6 +22,12 @@ def create_key_list():
 
 
 def test_pin_pad(args):
+    if len(args) < 10:
+        logging.info("You must give the row pins, column pins, the buzzer pin, the pin and an escape key")
+        logging.warning("Je moet 4 'rij' pin nummers, 3 'kolom' pin nummers, de pin nummer van de buzzer, de pincode "
+                        "en de resetknop (tussen ' ') meegeven. Dit zijn in totaal 10 waarden")
+        sys.exit(1)
+    logging.warning("Testen van het pinpad")
     row_pins = [int(arg) for arg in args[0:4]]
     col_pins = [int(arg) for arg in args[4:7]]
     buzzer_pin = int(args[7])

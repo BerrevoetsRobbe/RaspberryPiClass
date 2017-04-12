@@ -3,6 +3,8 @@
 import RPi.GPIO as GPIO
 import logging
 
+import sys
+
 from Actuators.BaseActuators.Buzzer import Buzzer
 from time import time, sleep
 
@@ -29,8 +31,13 @@ def test_general(buzzer):
 
 
 def test_buzzer(args):
+    if len(args) < 1:
+        logging.info("You must give buzzer pin as arguments")
+        logging.warning("Je moet minstens 1 pin nummer meegeven")
+        sys.exit(1)
     buzzer = Buzzer(int(args[0]))
     buzzer.start()
+    logging.warning("Testen van buzzer")
     try:
         start_time = time()
         buzzer.perform_action_idle()

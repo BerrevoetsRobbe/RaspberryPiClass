@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import logging
 
 from Actuators.BaseActuators.Camera import Camera
 from time import time, sleep
@@ -17,6 +18,7 @@ def test_general(camera):
 def test_camera(_):
     camera = Camera()
     camera.start()
+    logging.warning("Testen van camera")
     try:
         start_time = time()
         camera.perform_action_idle()
