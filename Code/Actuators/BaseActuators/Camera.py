@@ -38,6 +38,7 @@ class Camera(BaseActuator):
         self.set_state(TakePicture(self, duration=duration, returning_state=self.state))
 
     def take_picture(self):
+        logging.warning("Camera neemt foto")
         self.__stream.seek(0)
         file_name = 'Images/image_{counter}_{date}.jpg'.format(counter=self.__counter,
                                                                    date=datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))

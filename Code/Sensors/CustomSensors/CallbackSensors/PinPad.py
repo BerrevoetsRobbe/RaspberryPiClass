@@ -27,9 +27,11 @@ class PinPad(CallbackSensor):
     def register_key(self, key):
         if key.get_value() == self.__escape_key:
             logger.debug("escape key entered")
+            logger.warning("reset knop is ingedrukt, je kan opnieuw de code ingeven")
             self.__key_history = []
         else:
             self.__key_history.append(key.get_value())
+            logger.warning("De knop met waarde {key} is geregistreerd".format(key=key.get_value()))
             logger.debug("key {key} entered, "
                          "current key history is {key_history}".format(key=key.get_value(),
                                                                        key_history=str(self.__key_history)))
@@ -44,6 +46,7 @@ class PinPad(CallbackSensor):
     def __pin_entered(self):
         self.__activated = not self.__activated
         logger.info("pin entered: system is now {active}active".format(active="not " if not self.__activated else ""))
+        logger.warning("pincode is ingevoerd: system is nu {active}actief".format(active="in" if not self.__activated else ""))
         self.callback_function(self.__activated)
 
     def destroy(self):

@@ -20,10 +20,12 @@ class DoorSensor(CallbackSensor):
                 self.__open = False
                 self.callback_function(self.__open)
                 logging.info("Door closed")
+                logging.warning("De deur is gesloten")
             elif not self.__open and self.__sensor.get_value() == self.__open_value:
                 self.__open = True
                 self.callback_function(self.__open)
                 logging.info("Door opened")
+                logging.warning("De deur is open")
             sleep(0.000001)
         self.destroy()
 

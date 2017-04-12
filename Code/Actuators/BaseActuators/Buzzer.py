@@ -33,11 +33,13 @@ class Buzzer(BaseActuator):
 
     def sound_buzzer(self):
         logging.debug("start sounding buzzer {buzzer}".format(buzzer=self))
+        logging.warning("Buzzer aan")
         GPIO.setup(self.__buzzer_pin, GPIO.OUT)
         GPIO.output(self.__buzzer_pin, self.BUZZER_SOUND_OUTPUT)
 
     def mute_buzzer(self):
         logging.debug("mute buzzer {buzzer}".format(buzzer=self))
+        logging.warning("Buzzer uit")
         GPIO.setup(self.__buzzer_pin, GPIO.OUT)
         GPIO.output(self.__buzzer_pin, self.BUZZER_MUTE_OUTPUT)
         GPIO.setup(self.__buzzer_pin, GPIO.IN)

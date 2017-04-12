@@ -57,14 +57,17 @@ class LED(BaseActuator):
         self.__g_pulse.ChangeDutyCycle(value)
 
     def green(self):
+        logging.warning("LED brandt groen")
         self.__set_r_pulse(LED.PWM_MIN_VALUE)
         self.__set_g_pulse(LED.PWM_MAX_VALUE)
 
     def red(self):
+        logging.warning("LED brandt rood")
         self.__set_r_pulse(LED.PWM_MAX_VALUE)
         self.__set_g_pulse(LED.PWM_MIN_VALUE)
 
     def blank(self):
+        logging.warning("LED brandt niet")
         self.__set_r_pulse(LED.PWM_MIN_VALUE)
         self.__set_g_pulse(LED.PWM_MIN_VALUE)
 
