@@ -18,6 +18,7 @@ from Sensors.BaseSensors.PollingSensors.ReedSensor import ReedSensor
 from Sensors.CustomSensors.CallbackSensors.DoorSensor import DoorSensor
 from Sensors.CustomSensors.CallbackSensors.PinPad import PinPad
 from Sensors.CustomSensors.PollingSensors.ThresholdSensor import ThresholdSensor
+from Server.server import Server
 
 ADD_PATTERN = re.compile("add (?P<type>\D+) (?P<device>\D+)(?P<pin_numbers>(\s*\d+)*)")
 PIN_PATTERN = re.compile("set pin (?P<pin>\D+)")
@@ -228,6 +229,8 @@ while True:
         global alarm
         GPIO.setmode(GPIO.BCM)
         parse_arguments()
+        http_server = Server(8080)
+        http_server.start_server()
         alarm = Alarm()
         alarm.start()
         while True:

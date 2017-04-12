@@ -2,7 +2,7 @@ import argparse
 import logging
 import os
 
-from tornado.gen import coroutine
+from tornado.gen import coroutine, Task
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 from tornado.web import Application, RequestHandler, StaticFileHandler, url, asynchronous

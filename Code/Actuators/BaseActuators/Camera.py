@@ -1,5 +1,4 @@
 import logging
-import cv2
 
 from datetime import datetime
 from picamera import PiCamera
@@ -43,7 +42,7 @@ class Camera(BaseActuator):
         file_name = 'Images/image_{counter}_{date}.jpg'.format(counter=self.__counter,
                                                                    date=datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
         self.__camera.capture(file_name)
-        self.__camera.capture(self.__stream, format='bgr', use_video_port=True, resize=(self.WIDTH, self.HEIGHT))
+        self.__camera.capture(self.__stream, format='jpeg', use_video_port=True, resize=(self.WIDTH, self.HEIGHT))
         self.__counter += 1
         self.__last_image = self.__stream.array
 
@@ -59,9 +58,10 @@ class Camera(BaseActuator):
 
     def get_last_image_jpg(self):
         if self.__last_image is not None:
-            result, image = cv2.imencode('.jpg', self.__last_image, self.__encoding_options)
-            if result:
-                return image
+            return self.__last_image
+            # result, image = cv2.imencode('.jpg', self.__last_image, self.__encoding_options)
+            # if result:
+            #    return image
         return None
 
     @staticmethod
