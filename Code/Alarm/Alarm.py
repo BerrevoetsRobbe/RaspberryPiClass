@@ -44,6 +44,7 @@ class Alarm(Thread):
         return self.__actuators
 
     def add_actuator(self, actuator):
+        logging.info("Add actuator {actuator} to alarm".format(actuator=actuator))
         self.__actuators.append(actuator)
 
     def refresh(self):
@@ -53,5 +54,7 @@ class Alarm(Thread):
         self.exit_flag = True
 
     def destroy(self):
+        logging.info("Cleanup Alarm")
         for actuator in self.get_actuators():
+            logging.info("Stopping {actuator}".format(actuator=actuator))
             actuator.stop()

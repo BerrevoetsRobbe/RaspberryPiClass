@@ -1,5 +1,7 @@
 import re
 import logging
+import sys
+
 import zmq
 import RPi.GPIO as GPIO
 
@@ -20,14 +22,18 @@ from Sensors.CustomSensors.CallbackSensors.PinPad import PinPad
 from Sensors.CustomSensors.PollingSensors.ThresholdSensor import ThresholdSensor
 from Server.server import Server
 
-ADD_PATTERN = re.compile("add (?P<type>\D+) (?P<device>\D+)(?P<pin_numbers>(\s*\d+)*)")
-PIN_PATTERN = re.compile("set pin (?P<pin>\D+)")
+ADD_PATTERN = re.compile("add (?P<type>\w+) (?P<device>\w+)(?P<pin_numbers>(\s*\d+)*)")
+ADD_PATTERN_NL = re.compile("voeg toe (?P<type>\w+) (?P<device>\w+)(?P<pin_numbers>(\s*\d+)*)")
+PIN_PATTERN = re.compile("set pin (?P<pin>\w+)")
+PIN_PATTERN_NL = re.compile("stel pin in (?P<pin>\w+)")
 RESET_ALARM_PATTERN = re.compile("reset alarm")
+TAKE_PICTURE_PATTERN = re.compile("take picture")
 LIGHT_THRESHOLD = 0.5
 
 alarm = None
 buzzer = None
 pinpad = None
+camera = None
 door_sensor = None
 PIN = "3576"
 escape_key = '*'
@@ -48,7 +54,7 @@ def add_actuator(device, pin_numbers):
     if device in ACTUATOR_POSSIBILITIES.keys():
         ACTUATOR_POSSIBILITIES[device](pin_numbers)
     else:
-        logging.info("Wrong device given for actuators: {device}".format(device=device))
+        logging.info("Wrong device given for actuators: {device}!".format(device=device))
 
 
 def add_door_sensor(device, pin_numbers):
@@ -69,6 +75,7 @@ def add_actuator_led(pin_numbers):
     global alarm
     if len(pin_numbers) < 2:
         logging.info("Not enough pin numbers given for LED initialisation")
+        return
     led = LED(pin_numbers[0], pin_numbers[1])
     led.start()
     alarm.add_actuator(led)
@@ -78,6 +85,7 @@ def add_actuator_buzzer(pin_numbers):
     global alarm, buzzer
     if len(pin_numbers) < 1:
         logging.info("Not enough pin numbers given for buzzer initialisation")
+        return
     buzzer = Buzzer(pin_numbers[0])
     buzzer.start()
     alarm.add_actuator(buzzer)
@@ -87,7 +95,7 @@ def add_actuator_multiple_led(pin_numbers):
     global alarm
     if len(pin_numbers) % 2 != 0:
         logging.info("Not enough pin numbers given for multiple led initialisation")
-
+        return
     leds = [LED(pin_numbers[i], pin_numbers[i + 1]) for i in range(0, len(pin_numbers), 2)]
     for led in leds:
         led.start()
@@ -97,8 +105,8 @@ def add_actuator_multiple_led(pin_numbers):
     alarm.add_actuator(multiple_led)
 
 
-def add_actuator_camera():
-    global alarm
+def add_actuator_camera(_):
+    global alarm, camera
     camera = Camera()
     alarm.add_actuator(camera)
 
@@ -107,6 +115,7 @@ def add_door_sensor_light_sensor(pin_numbers):
     global alarm, door_sensor
     if len(pin_numbers) < 1:
         logging.info("Not enough pin numbers given for light sensor initialisation")
+        return
     light_sensor = LightSensor(pin_numbers[0])
     threshold_sensor = ThresholdSensor(light_sensor, LIGHT_THRESHOLD)
     door_sensor = DoorSensor(threshold_sensor, 1, 0,  partial(Alarm.callback_door, alarm))
@@ -117,15 +126,17 @@ def add_door_sensor_reed_switch(pin_numbers):
     global alarm, door_sensor
     if len(pin_numbers) < 1:
         logging.info("Not enough pin numbers given for reed sensor initialisation")
+        return
     reed_sensor = ReedSensor(pin_numbers[0])
     door_sensor = DoorSensor(reed_sensor, 1, 0, partial(Alarm.callback_door, alarm))
     door_sensor.start()
 
 
 def add_activation_sensor_pinpad(pin_numbers):
-    global alarm, pinpad, PIN, escape_key
+    global alarm, pinpad, PIN, escape_key, buzzer
     if len(pin_numbers) < 7:
         logging.info("Not enough pin numbers given for pinpad initialisation")
+        return
     keys = create_key_list()
     pinpad = PinPad(pin_numbers[0:4], pin_numbers[4:7], keys, PIN, escape_key, buzzer,
                     callback_function=partial(Alarm.callback_activation, alarm))
@@ -142,6 +153,7 @@ def set_pin(pin):
 
 def reset_alarm():
     global alarm, door_sensor, pinpad
+    logging.info("Resetting alarm")
     if alarm:
         alarm.stop()
     if door_sensor:
@@ -204,44 +216,93 @@ def setup_logger(log_level=None, filename=None):
     logging.info("logger configured")
 
 
+def take_picture():
+    global camera
+    if camera:
+        camera.take_picture()
+
+
 def perform_action(message):
+    matched = False
     match = ADD_PATTERN.match(message)
     if match and match.group('type').upper() in DEVICE_TYPES.keys():
+        logging.info("adding Actuator with type {type}"
+                     " and pin numbers {pin_numbers}.".format(type=match.group('type').upper(),
+                                                              pin_numbers=match.group('pin_numbers')))
         _type = match.group('type').upper()
         device = match.group('device').upper()
-        pin_numbers = [int(i) for i in match.group('pin_numbers').split(' ')]
+        if match.group('pin_numbers'):
+            pin_numbers = [int(i) for i in match.group('pin_numbers')[1:].split(' ')]
+        else:
+            pin_numbers = []
         DEVICE_TYPES[_type](device, pin_numbers)
+        matched = True
+    match = ADD_PATTERN_NL.match(message)
+    if match and match.group('type').upper() in DEVICE_TYPES.keys():
+        logging.info("adding Actuator with type {type}"
+                     " and pin numbers {pin_numbers}.".format(type=match.group('type').upper(),
+                                                              pin_numbers=match.group('pin_numbers')))
+        _type = match.group('type').upper()
+        device = match.group('device').upper()
+        if match.group('pin_numbers'):
+            pin_numbers = [int(i) for i in match.group('pin_numbers')[1:].split(' ')]
+        else:
+            pin_numbers = []
+        DEVICE_TYPES[_type](device, pin_numbers)
+        matched = True
     match = PIN_PATTERN.match(message)
     if match:
         set_pin(match.group('pin'))
+        matched = True
+    match = PIN_PATTERN_NL.match(message)
+    if match:
+        set_pin(match.group('pin'))
+        matched = True
     match = RESET_ALARM_PATTERN.match(message)
     if match:
         reset_alarm()
-    else:
+        matched = True
+    match = TAKE_PICTURE_PATTERN.match(message)
+    if match:
+        matched = True
+        take_picture()
+    if not matched:
         logging.info("wrong command given: {command}".format(command=message))
 
 context = zmq.Context()
 server = context.socket(zmq.REP)
 server.connect("tcp://0.0.0.0:5555")
 
-while True:
-    try:
-        global alarm
-        GPIO.setmode(GPIO.BCM)
-        parse_arguments()
-        http_server = Server(8080)
-        http_server.start_server()
-        alarm = Alarm()
-        alarm.start()
-        while True:
-            message = server.recv_string()
-            if message:
-                logging.info('received command "{message}"'.format(message=message))
+parse_arguments()
+
+http_server = Server(8080)
+http_server.start()
+
+try:
+    global alarm
+    GPIO.setmode(GPIO.BCM)
+    alarm = Alarm()
+    alarm.start()
+    logging.info("Alarm started")
+    while True:
+        message = server.recv_string()
+        if message:
+            logging.info('received command "{message}"'.format(message=message))
+            logging.warning('Commando "{message} ontvangen"'.format(message=message))
+            try:
                 perform_action(message)
-                alarm.refresh()
-                server.send_string('command "{message}" executed'.format(message=message))
-                sleep(0.5)
-    except KeyboardInterrupt:
-        reset_alarm()
-        alarm.stop()
-        GPIO.cleanup()
+                logging.info('performed command "{message}"'.format(message=message))
+                logging.warning('Commando "{message}" uitgevoerd'.format(message=message))
+                server.send_string('commando "{message}" uitgevoerd'.format(message=message))
+            except:
+                logging.warning('Er is een fout opgetreden, kan commando "{message}" niet uitvoeren'.format(message=message))
+                server.send_string('Er is een fout opgetreden, kan commando "{message}" niet uitvoeren'.format(message=message))
+            alarm.refresh()
+            sleep(0.5)
+except KeyboardInterrupt:
+    reset_alarm()
+    http_server.cleanup()
+    alarm.stop()
+    sleep(1)
+    GPIO.cleanup()
+    sys.exit(0)

@@ -15,6 +15,7 @@ from Sensors.BaseSensors.CallbackSensors.Keys.SymbolKey import SymbolKey
 from Sensors.BaseSensors.PollingSensors.ReedSensor import ReedSensor
 from Sensors.CustomSensors.CallbackSensors.DoorSensor import DoorSensor
 from Sensors.CustomSensors.CallbackSensors.PinPad import PinPad
+from Server.server import Server
 
 alarm = None
 multiple_led = None
@@ -100,6 +101,8 @@ def parse_arguments():
     logging.debug("Arguments supplied to testing are: {args}".format(args=args))
 
     global alarm
+    http_server = Server(8080)
+    http_server.start_server()
     alarm = Alarm()
     alarm.start()
     add_camera()

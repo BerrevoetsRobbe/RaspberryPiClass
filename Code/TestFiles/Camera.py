@@ -3,6 +3,7 @@ import logging
 
 from Actuators.BaseActuators.Camera import Camera
 from time import time, sleep
+from Server.server import Server
 
 IDLE_TIME = 5
 ACTIVATION_TIME = 5
@@ -16,19 +17,12 @@ def test_general(camera):
 
 
 def test_camera(_):
+    http_server = Server(8080)
+    http_server.start()
     camera = Camera()
     camera.start()
-    logging.warning("Testen van camera")
+    logging.warning("Testen van de camera")
     try:
-        start_time = time()
-        camera.perform_action_idle()
-        while start_time + IDLE_TIME > time():
-            # yield processor
-            sleep(0.000001)
-        camera.perform_action_activated()
-        while start_time + IDLE_TIME + ACTIVATION_TIME > time():
-            # yield processor
-            sleep(0.000001)
         camera.perform_action_triggered(10)
         while True:
             # yield processor
@@ -36,3 +30,4 @@ def test_camera(_):
     finally:
         camera.stop()
         camera.join(2)
+        http_server.cleanup()
