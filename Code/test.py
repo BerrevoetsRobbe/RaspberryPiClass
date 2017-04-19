@@ -21,6 +21,7 @@ test_func = dict(
     MULTIPLE_LED=test_multiple_led,
     NUM_PAD=test_num_pad,
     PIN_PAD=test_pin_pad,
+    PINPAD=test_pin_pad,
     REED_SENSOR=test_reed_sensor,
     MAGNEET_SENSOR=test_reed_sensor,
 )

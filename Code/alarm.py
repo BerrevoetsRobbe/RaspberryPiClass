@@ -28,6 +28,8 @@ PIN_PATTERN = re.compile("set pin (?P<pin>\w+)")
 PIN_PATTERN_NL = re.compile("stel pin in (?P<pin>\w+)")
 RESET_ALARM_PATTERN = re.compile("reset alarm")
 TAKE_PICTURE_PATTERN = re.compile("take picture")
+ACTIVATION_PATTERN_NL = re.compile("activeer alarm")
+DEACTIVATION_PATTERN_NL = re.compile("deactiveer alarm")
 LIGHT_THRESHOLD = 0.5
 
 alarm = None
@@ -107,14 +109,16 @@ def add_actuator_multiple_led(pin_numbers):
 
 def add_actuator_camera(_):
     global alarm, camera
-    camera = Camera()
-    alarm.add_actuator(camera)
+    if camera is None:
+        camera = Camera()
+        alarm.add_actuator(camera)
 
 
 def add_door_sensor_light_sensor(pin_numbers):
     global alarm, door_sensor
     if len(pin_numbers) < 1:
         logging.info("Not enough pin numbers given for light sensor initialisation")
+        logging.warning("Er zijn niet genoeg pin nummers gegeven om de lichtsensor te kunnen verbinden")
         return
     light_sensor = LightSensor(pin_numbers[0])
     threshold_sensor = ThresholdSensor(light_sensor, LIGHT_THRESHOLD)
@@ -126,6 +130,7 @@ def add_door_sensor_reed_switch(pin_numbers):
     global alarm, door_sensor
     if len(pin_numbers) < 1:
         logging.info("Not enough pin numbers given for reed sensor initialisation")
+        logging.warning("Er zijn niet genoeg pin nummers gegeven om de magneet sensor te kunnen verbinden")
         return
     reed_sensor = ReedSensor(pin_numbers[0])
     door_sensor = DoorSensor(reed_sensor, 1, 0, partial(Alarm.callback_door, alarm))
@@ -136,6 +141,10 @@ def add_activation_sensor_pinpad(pin_numbers):
     global alarm, pinpad, PIN, escape_key, buzzer
     if len(pin_numbers) < 7:
         logging.info("Not enough pin numbers given for pinpad initialisation")
+        logging.warning("Er zijn niet genoeg pin nummers gegeven om de pinpad te kunnen verbinden")
+        return
+    if buzzer is None:
+        logging.warning("Er moet een buzzer verbonden zijn met het alarm")
         return
     keys = create_key_list()
     pinpad = PinPad(pin_numbers[0:4], pin_numbers[4:7], keys, PIN, escape_key, buzzer,
@@ -148,12 +157,14 @@ def set_pin(pin):
     if pinpad:
         pinpad.set_pin(pin)
     else:
+        logging.warning("Er is nog geen pinpad verbonden met het alarm")
         logging.info("Pinpad must first be added")
 
 
 def reset_alarm():
     global alarm, door_sensor, pinpad
     logging.info("Resetting alarm")
+    logging.warning("Alarm wordt gereset")
     if alarm:
         alarm.stop()
     if door_sensor:
@@ -167,7 +178,9 @@ def reset_alarm():
 DEVICE_TYPES = dict(
     ACTUATOR=add_actuator,
     DOOR_SENSOR=add_door_sensor,
+    DEUR_SENSOR=add_door_sensor,
     ACTIVATION_SENSOR=add_activation_sensor,
+    ACTIVATIE_SENSOR=add_activation_sensor,
 )
 
 ACTUATOR_POSSIBILITIES = dict(
@@ -180,6 +193,7 @@ ACTUATOR_POSSIBILITIES = dict(
 DOOR_SENSOR_POSSIBILITIES = dict(
     LIGHT_SENSOR=add_door_sensor_light_sensor,
     REED_SWITCH=add_door_sensor_reed_switch,
+    MAGNEET_SENSOR=add_door_sensor_reed_switch,
 )
 
 
@@ -222,6 +236,16 @@ def take_picture():
         camera.take_picture()
 
 
+def activate_alarm():
+    global alarm
+    alarm.callback_activation(True)
+
+
+def deactivate_alarm():
+    global alarm
+    alarm.callback_activation(False)
+
+
 def perform_action(message):
     matched = False
     match = ADD_PATTERN.match(message)
@@ -261,6 +285,14 @@ def perform_action(message):
     match = RESET_ALARM_PATTERN.match(message)
     if match:
         reset_alarm()
+        matched = True
+    match = ACTIVATION_PATTERN_NL.match(message)
+    if match:
+        activate_alarm()
+        matched = True
+    match = DEACTIVATION_PATTERN_NL.match(message)
+    if match:
+        deactivate_alarm()
         matched = True
     match = TAKE_PICTURE_PATTERN.match(message)
     if match:
