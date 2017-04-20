@@ -54,50 +54,55 @@ def create_key_list():
 
 def add_actuator(device, pin_numbers):
     if device in ACTUATOR_POSSIBILITIES.keys():
-        ACTUATOR_POSSIBILITIES[device](pin_numbers)
+        return ACTUATOR_POSSIBILITIES[device](pin_numbers)
     else:
         logging.info("Wrong device given for actuators: {device}!".format(device=device))
+        return False
 
 
 def add_door_sensor(device, pin_numbers):
     if device in DOOR_SENSOR_POSSIBILITIES.keys():
-        DOOR_SENSOR_POSSIBILITIES[device](pin_numbers)
+        return DOOR_SENSOR_POSSIBILITIES[device](pin_numbers)
     else:
         logging.info("Wrong device given for door sensor: {device}".format(device=device))
+        return False
 
 
 def add_activation_sensor(device, pin_numbers):
     if device in ACTIVATION_SENSOR_POSSIBILITIES.keys():
-        ACTIVATION_SENSOR_POSSIBILITIES[device](pin_numbers)
+        return ACTIVATION_SENSOR_POSSIBILITIES[device](pin_numbers)
     else:
         logging.info("Wrong device given for activation sensor: {device}".format(device=device))
+        return False
 
 
 def add_actuator_led(pin_numbers):
     global alarm
     if len(pin_numbers) < 2:
         logging.info("Not enough pin numbers given for LED initialisation")
-        return
+        return False
     led = LED(pin_numbers[0], pin_numbers[1])
     led.start()
     alarm.add_actuator(led)
+    return True
 
 
 def add_actuator_buzzer(pin_numbers):
     global alarm, buzzer
     if len(pin_numbers) < 1:
         logging.info("Not enough pin numbers given for buzzer initialisation")
-        return
+        return False
     buzzer = Buzzer(pin_numbers[0])
     buzzer.start()
     alarm.add_actuator(buzzer)
+    return True
 
 
 def add_actuator_multiple_led(pin_numbers):
     global alarm
     if len(pin_numbers) % 2 != 0:
         logging.info("Not enough pin numbers given for multiple led initialisation")
-        return
+        return False
     leds = [LED(pin_numbers[i], pin_numbers[i + 1]) for i in range(0, len(pin_numbers), 2)]
     for led in leds:
         led.start()
@@ -105,6 +110,7 @@ def add_actuator_multiple_led(pin_numbers):
     multiple_led = MultipleLED(leds)
     multiple_led.start()
     alarm.add_actuator(multiple_led)
+    return True
 
 
 def add_actuator_camera(_):
@@ -112,6 +118,10 @@ def add_actuator_camera(_):
     if camera is None:
         camera = Camera()
         alarm.add_actuator(camera)
+        return True
+    else:
+        logging.warning("De camera is al toegevoegd")
+        return False
 
 
 def add_door_sensor_light_sensor(pin_numbers):
@@ -119,11 +129,12 @@ def add_door_sensor_light_sensor(pin_numbers):
     if len(pin_numbers) < 1:
         logging.info("Not enough pin numbers given for light sensor initialisation")
         logging.warning("Er zijn niet genoeg pin nummers gegeven om de lichtsensor te kunnen verbinden")
-        return
+        return False
     light_sensor = LightSensor(pin_numbers[0])
     threshold_sensor = ThresholdSensor(light_sensor, LIGHT_THRESHOLD)
     door_sensor = DoorSensor(threshold_sensor, 1, 0,  partial(Alarm.callback_door, alarm))
     door_sensor.start()
+    return True
 
 
 def add_door_sensor_reed_switch(pin_numbers):
@@ -131,10 +142,11 @@ def add_door_sensor_reed_switch(pin_numbers):
     if len(pin_numbers) < 1:
         logging.info("Not enough pin numbers given for reed sensor initialisation")
         logging.warning("Er zijn niet genoeg pin nummers gegeven om de magneet sensor te kunnen verbinden")
-        return
+        return False
     reed_sensor = ReedSensor(pin_numbers[0])
     door_sensor = DoorSensor(reed_sensor, 1, 0, partial(Alarm.callback_door, alarm))
     door_sensor.start()
+    return True
 
 
 def add_activation_sensor_pinpad(pin_numbers):
@@ -142,23 +154,25 @@ def add_activation_sensor_pinpad(pin_numbers):
     if len(pin_numbers) < 7:
         logging.info("Not enough pin numbers given for pinpad initialisation")
         logging.warning("Er zijn niet genoeg pin nummers gegeven om de pinpad te kunnen verbinden")
-        return
+        return False
     if buzzer is None:
         logging.warning("Er moet een buzzer verbonden zijn met het alarm")
-        return
+        return False
     keys = create_key_list()
     pinpad = PinPad(pin_numbers[0:4], pin_numbers[4:7], keys, PIN, escape_key, buzzer,
                     callback_function=partial(Alarm.callback_activation, alarm))
     pinpad.start()
-
+    return False
 
 def set_pin(pin):
     global pinpad
     if pinpad:
         pinpad.set_pin(pin)
+        return True
     else:
         logging.warning("Er is nog geen pinpad verbonden met het alarm")
         logging.info("Pinpad must first be added")
+        return False
 
 
 def reset_alarm():
@@ -174,6 +188,7 @@ def reset_alarm():
     sleep(1)
     alarm = Alarm()
     alarm.start()
+    return True
 
 DEVICE_TYPES = dict(
     ACTUATOR=add_actuator,
@@ -200,6 +215,7 @@ DOOR_SENSOR_POSSIBILITIES = dict(
 ACTIVATION_SENSOR_POSSIBILITIES = dict(
     PINPAD=add_activation_sensor_pinpad,
 )
+
 
 def parse_arguments():
     parser = ArgumentParser(description='test different elements')
@@ -247,7 +263,6 @@ def deactivate_alarm():
 
 
 def perform_action(message):
-    matched = False
     match = ADD_PATTERN.match(message)
     if match and match.group('type').upper() in DEVICE_TYPES.keys():
         logging.info("adding Actuator with type {type}"
@@ -259,8 +274,7 @@ def perform_action(message):
             pin_numbers = [int(i) for i in match.group('pin_numbers')[1:].split(' ')]
         else:
             pin_numbers = []
-        DEVICE_TYPES[_type](device, pin_numbers)
-        matched = True
+        return DEVICE_TYPES[_type](device, pin_numbers)
     match = ADD_PATTERN_NL.match(message)
     if match and match.group('type').upper() in DEVICE_TYPES.keys():
         logging.info("adding Actuator with type {type}"
@@ -272,34 +286,28 @@ def perform_action(message):
             pin_numbers = [int(i) for i in match.group('pin_numbers')[1:].split(' ')]
         else:
             pin_numbers = []
-        DEVICE_TYPES[_type](device, pin_numbers)
-        matched = True
+        return DEVICE_TYPES[_type](device, pin_numbers)
     match = PIN_PATTERN.match(message)
     if match:
-        set_pin(match.group('pin'))
-        matched = True
+        return set_pin(match.group('pin'))
     match = PIN_PATTERN_NL.match(message)
     if match:
-        set_pin(match.group('pin'))
-        matched = True
+        return set_pin(match.group('pin'))
     match = RESET_ALARM_PATTERN.match(message)
     if match:
-        reset_alarm()
-        matched = True
+        return reset_alarm()
     match = ACTIVATION_PATTERN_NL.match(message)
     if match:
-        activate_alarm()
-        matched = True
+        return activate_alarm()
     match = DEACTIVATION_PATTERN_NL.match(message)
     if match:
-        deactivate_alarm()
-        matched = True
+        return deactivate_alarm()
     match = TAKE_PICTURE_PATTERN.match(message)
     if match:
-        matched = True
-        take_picture()
-    if not matched:
-        logging.info("wrong command given: {command}".format(command=message))
+        return take_picture()
+    logging.warning('Alarm kent het commando "{command}" niet'.format(command=message))
+    logging.info("wrong command given: {command}".format(command=message))
+    return False
 
 context = zmq.Context()
 server = context.socket(zmq.REP)
@@ -311,21 +319,25 @@ http_server = Server(8080)
 http_server.start()
 
 try:
-    global alarm
     GPIO.setmode(GPIO.BCM)
     alarm = Alarm()
     alarm.start()
     logging.info("Alarm started")
+    logging.warning("Alarm is gestart")
     while True:
         message = server.recv_string()
         if message:
             logging.info('received command "{message}"'.format(message=message))
-            logging.warning('Commando "{message} ontvangen"'.format(message=message))
+            logging.warning('Commando "{message}" ontvangen'.format(message=message))
             try:
-                perform_action(message)
-                logging.info('performed command "{message}"'.format(message=message))
-                logging.warning('Commando "{message}" uitgevoerd'.format(message=message))
-                server.send_string('commando "{message}" uitgevoerd'.format(message=message))
+                executed = perform_action(message)
+                if executed:
+                    logging.info('performed command "{message}"'.format(message=message))
+                    logging.warning('Commando "{message}" uitgevoerd'.format(message=message))
+                    server.send_string('commando "{message}" uitgevoerd'.format(message=message))
+                else:
+                    logging.warning('FOUT: Commando "{message}" kon niet uitgevoerd worden'.format(message=message))
+                    server.send_string('FOUT: commando "{message}" niet uitgevoerd'.format(message=message))
             except:
                 logging.warning('Er is een fout opgetreden, kan commando "{message}" niet uitvoeren'.format(message=message))
                 server.send_string('Er is een fout opgetreden, kan commando "{message}" niet uitvoeren'.format(message=message))
