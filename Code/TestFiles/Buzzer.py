@@ -39,15 +39,6 @@ def test_buzzer(args):
     buzzer.start()
     logging.warning("Testen van buzzer")
     try:
-        start_time = time()
-        buzzer.perform_action_idle()
-        while start_time + IDLE_TIME > time():
-            # yield processor
-            sleep(0.000001)
-        buzzer.perform_action_activated()
-        while start_time + IDLE_TIME + ACTIVATION_TIME > time():
-            # yield processor
-            sleep(0.000001)
         buzzer.perform_action_triggered(10)
         while True:
             # yield processor

@@ -2,12 +2,15 @@ import re
 import logging
 import sys
 
-import zmq
 import RPi.GPIO as GPIO
 
 from argparse import ArgumentParser
 from functools import partial
 from time import sleep
+
+from zmq import Context
+from zmq.backend.cython.constants import REP
+
 from Actuators.BaseActuators.Buzzer import Buzzer
 from Actuators.BaseActuators.Camera import Camera
 from Actuators.BaseActuators.LED import LED
@@ -255,11 +258,13 @@ def take_picture():
 def activate_alarm():
     global alarm
     alarm.callback_activation(True)
+    return True
 
 
 def deactivate_alarm():
     global alarm
     alarm.callback_activation(False)
+    return True
 
 
 def perform_action(message):
@@ -309,8 +314,8 @@ def perform_action(message):
     logging.info("wrong command given: {command}".format(command=message))
     return False
 
-context = zmq.Context()
-server = context.socket(zmq.REP)
+context = Context()
+server = context.socket(REP)
 server.connect("tcp://0.0.0.0:5555")
 
 parse_arguments()

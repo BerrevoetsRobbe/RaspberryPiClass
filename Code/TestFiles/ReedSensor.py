@@ -28,7 +28,7 @@ def test_reed_sensor(args):
                 led.perform_action_activated()
                 sleep(0.000001)
             if reed_sensor.get_value() == 1 and reed_sensor.get_value() != last_value:
-                logging.warning("De magneet sensor neemt een magneet waar")
+                logging.warning("De magneet sensor neemt geen magneet waar")
                 last_value = 1
                 led.perform_action_idle()
                 sleep(0.000001)

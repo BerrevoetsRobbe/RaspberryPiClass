@@ -3,10 +3,10 @@ import logging
 from time import sleep
 
 import RPi.GPIO as GPIO
-from Sensors.BaseSensors.NumKey import NumKey
-from Sensors.BaseSensors.SymbolKey import SymbolKey
 
 from Actuators.BaseActuators.Buzzer import Buzzer
+from Sensors.BaseSensors.CallbackSensors.Keys.NumKey import NumKey
+from Sensors.BaseSensors.CallbackSensors.Keys.SymbolKey import SymbolKey
 from Sensors.BaseSensors.CallbackSensors.NumPad import NumPad
 
 

@@ -34,6 +34,7 @@ def test_led(args):
     led.start()
     try:
         led.perform_action_idle()
+        sleep(2)
         led.perform_action_triggered(duration=TRIGGERED_TIME)
         while True:
             # yield processor
